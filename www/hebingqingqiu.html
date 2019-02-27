@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>合并请求</title>
+  </head>
+  <body>
+
+    <div id="app"></div>
+
+    <script src="https://cdn.bootcss.com/vue/2.6.4/vue.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.18.0/axios.js"></script>
+
+    <script type="text/javascript" >
+
+      var App = {
+        template: `<div>
+          one res : {{ res1 }}
+          <hr />
+          two res : {{ res2 }}
+          <hr />
+          <button @click="sendAjax">all</button>
+        </div>`,
+        data() {
+          return {
+            res1: '',
+            res2: ''
+          }
+        },
+        methods: {
+          sendAjax() {
+            // 让组件具备axios对象的引用 axios.get||post||put||delete(url,[post的时候有data],options)
+
+            // 配置公共数据
+            // axios.defaluts.baseURL = ''
+
+            let q1 = axios.post('/add','b=2')
+            let q2 = axios.post('/upload','a=1')
+
+            // 合并这两个请求，并处理其成功和失败
+            // 一般会用于两个分开的相关联的请求，缺一不可
+            axios.all([q1,q2])
+            .then(axios.spread((res1,res2) => {
+              // 全成功
+              this.res1 = res1.data
+              this.res2 = res2.data
+              console.log(res1,res2)
+            }))
+            .catch(err => {
+              // 其一失败
+              console.log(err)
+            })
+          }
+        },
+      }
+
+      // 组件内的每一个this对象，都是vue的孩子
+      // Vue祖宗的原型数据，就会共享给所有的孩子
+      Vue.prototype.$axios = axios
+
+      new Vue({
+        el: '#app',
+        components: {
+          app: App
+        },       
+        template: '<app/>' // 入口组件
+      })
+    </script>
+  </body>
+</html>

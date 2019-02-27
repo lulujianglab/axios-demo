@@ -1,0 +1,22 @@
+{
+  "name": "axios-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "lulujianglab",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "express": "^4.16.4",
+    "express-static": "^1.2.6",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.0",
+    "multer": "^1.4.1",
+    "path": "^0.12.7",
+    "querystring": "^0.2.0",
+    "url": "^0.11.0"
+  }
+}

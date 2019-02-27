@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>options属性</head>
+  <body>
+
+    <div id="app"></div>
+
+    <script src="https://cdn.bootcss.com/vue/2.6.4/vue.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.18.0/axios.js"></script>
+
+    <script type="text/javascript" >
+
+      var App = {
+        template: `<div>
+          one res : {{ res1 }}
+          <hr />
+          two res : {{ res2 }}
+          <hr />
+          <button @click="sendAjax">all</button>
+        </div>`,
+        data() {
+          return {
+            res1: '',
+            res2: ''
+          }
+        },
+        methods: {
+          sendAjax() {
+            
+            // 所有请求自带的头信息
+            // axios.headers = {} // 覆盖原本默认头
+            // 走默认头，修改个例
+            // axios.defalut.headers.accept = 'abc'
+            
+            // 请求一
+            axios.get('/',{
+              params: {id:1},
+
+              // `transformResponse` 在传递给 then/catch 前，允许修改响应数据
+              transformResponse: (data) => {
+                console.log(data)
+
+                // 就是res.data,可以更改
+                data = 'data changed'
+
+                return data
+              }
+            })
+            .then(res => {
+              console.log(res,res.data)
+              this.res1 = res.data
+            })
+            .catch(err => {
+              console.log(err)
+            })
+
+            // 请求二
+            axios.post('/upload', 'name=jack', {
+              timeout: 1000,
+
+              // `transformRequest` 允许在向服务器发送前，修改请求数据
+              // 只能用在 'PUT', 'POST' 和 'PATCH' 这几个请求方法
+              transformRequest: (data) => {
+                // 加工请求体数据
+                return 'name=rose'
+              }
+            })
+            .then(res => {
+              console.log(res,res.data)
+              this.res2 = res.data
+            })
+            .catch(err => {
+              console.log(err)
+            })
+          }
+        },
+      }
+
+      // 组件内的每一个this对象，都是vue的孩子
+      // Vue祖宗的原型数据，就会共享给所有的孩子
+      Vue.prototype.$axios = axios
+
+      new Vue({
+        el: '#app',
+        components: {
+          app: App
+        },       
+        template: '<app/>' // 入口组件
+      })
+    </script>
+  </body>
+</html>

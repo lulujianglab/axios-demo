@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>取消请求</title>
+  </head>
+  <body>
+
+    <div id="app"></div>
+
+    <script src="https://cdn.bootcss.com/vue/2.6.4/vue.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.18.0/axios.js"></script>
+
+    <script type="text/javascript" >
+
+      var App = {
+        template: `<div>
+          upload progress : {{rate}}%
+          <hr />
+          choose file : <input type="file" name="file" @change="changeFile" />
+          <hr />
+          <button @click="sendAjax">sendReq</button>
+          <button @click="cancelAjax">cancelReq</button>
+          <button @click="resumeAjax">ContinueSendlReq</button>
+        </div>`,
+        data() {
+          return {
+            file: {},
+            rate: 0,
+            source: null,
+            loaded: 0
+          }
+        },
+        // created() {
+        //   axios.defaluts.onUploadProgress =  (progressEvent) => {
+        //     console.log(progressEvent.loaded)
+        //     console.log(progressEvent.total)
+
+        //     // 保存最后上传大小
+        //     this.loaded = progressEvent.loaded
+
+        //     this.rate = (progressEvent.loaded / progressEvent.total)*100
+        //   }
+        // },
+        methods: {
+          sendAjax() {
+
+            // 在请求前需要先生成独立的标识，才能更方便取消请求
+            const CancelToken = axios.CancelToken // 获取取消标识
+            const source = CancelToken.source() // 使用 CancelToken.source 工厂方法创建 cancel token
+            // 保存起来方便取消调用
+            this.source = source
+            
+            let fd = new FormData()
+            fd.append('file',this.file)
+            axios.post('/uploadfile',fd,{
+              // 携带取消标识
+              cancelToken: source.token,
+              onUploadProgress: (progressEvent) => {
+                console.log(progressEvent.loaded)
+                console.log(progressEvent.total)
+
+                // 保存最后上传大小
+                this.loaded = progressEvent.loaded
+
+                this.rate = (progressEvent.loaded / progressEvent.total)*100
+              }
+            })
+            .then(res => {
+              console.log(res.data)
+            })
+            .catch(err => {
+              console.log(err)
+            })
+          },
+          cancelAjax() {
+            // 取消请求：1.获取请求标识 2. 使用 CancelToken.source 工厂方法创建 cancel token，保存起来方便取消调用 3. 通过内部存好的方法做取消
+            this.source.cancel() // 通过内部存好的方法做取消
+          },
+          resumeAjax() {
+            // 剪裁文件        开始        结尾
+            const fileData = this.file.slice(this.loaded+1,this.file.size)
+            let fd = new FormData()
+            fd.append('file',fileData)
+
+            // 为了后续续传以后，再取消
+            const CancelToken = axios.CancelToken // 获取取消标识
+            const source = CancelToken.source() // 使用 CancelToken.source 工厂方法创建 cancel token
+            this.source = source
+
+            axios.post('/uploadfile',fd,{
+              // 携带取消标识
+              cancelToken: source.token,
+              onUploadProgress: (progressEvent) => {
+                // 保存最后上传大小
+                this.loaded = progressEvent.loaded
+                this.rate = (progressEvent.loaded / progressEvent.total)*100
+              }
+            })
+            .then(res => {
+              console.log(res.data)
+            })
+            .catch(err => {
+              console.log(err)
+            })
+          },
+          changeFile(e) {
+            // console.log(e.target.files[0])
+            this.file = e.target.files[0]
+          }
+        }
+      }
+
+      Vue.prototype.$axios = axios
+
+      new Vue({
+        el: '#app',
+        components: {
+          app: App
+        },       
+        template: '<app/>' // 入口组件
+      })
+    </script>
+  </body>
+</html>

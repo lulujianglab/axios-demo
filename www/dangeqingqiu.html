@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>简单请求</title>
+  </head>
+  <body>
+
+    <div id="app"></div>
+
+    <script src="https://cdn.bootcss.com/vue/2.6.4/vue.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.18.0/axios.js"></script>
+
+    <script type="text/javascript" >
+
+      var App = {
+        template: `<div>
+          <button @click="sendAjax">upload</button>
+        </div>`,
+        methods: {
+          sendAjax() {
+            // 让组件具备axios对象的引用 axios.get||post||put||delete(url,options)
+            axios.post('/upload', {
+              userName: 'zhangsan'
+            })
+            .then(res => {
+              console.log(res,res.data)
+            })
+            .catch(err => {
+              console.log(err)
+            })
+          }
+        },
+      }
+
+      // 组件内的每一个this对象，都是vue的孩子
+      // Vue祖宗的原型数据，就会共享给所有的孩子
+      Vue.prototype.$axios = axios
+
+      new Vue({
+        el: '#app',
+        components: {
+          app: App
+        },       
+        template: '<app/>' // 入口组件
+      })
+    </script>
+  </body>
+</html>
