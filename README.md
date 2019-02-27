@@ -1,10 +1,10 @@
 # axios-demo
 
-www 文件存放了多个静态文件来编写 axios 封装方法的 demo
+www 文件存放了多个静态文件来编写 `axios` 封装方法的 demo
 
-静态文件直接引用了 vuejs 进行开发
+静态文件直接引用了 `vuejs` 进行开发
 
-且通过 express 编写简易服务端代码
+且通过 `express` 编写简易服务端代码
 
 ## 项目编译和运行
 
